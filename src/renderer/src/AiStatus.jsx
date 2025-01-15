@@ -43,7 +43,7 @@ function AiStatus() {
         className={`fixed flex items-center justify-center bottom-4 right-4 select-none rounded-full size-16 border-2 border-stone-400 cursor-pointer hover:scale-110 transition-all duration-500 ${isAiEnabled ? "bg-green-500" : "bg-red-500"}`}
         onClick={openDialog}
       >
-        <img src="/ai.svg" alt="AI" />
+        <img src="ai.svg" alt="AI" />
       </span>
       <dialog
         ref={dialogRef}

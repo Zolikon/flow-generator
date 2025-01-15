@@ -1,5 +1,5 @@
 appId: com.zolikon.flow-generator
-productName: glow-generator
+productName: flow-generator
 directories:
   buildResources: build
 files:
@@ -11,7 +11,7 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: electron-template
+  executableName: flow-generator
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
