@@ -1,6 +1,7 @@
 import { createContext, useContext, useReducer } from "react";
 import PropTypes from "prop-types";
 import { useSubscribe } from "./useSubsribe";
+import { useElectron } from "./useElectron";
 
 const EditorContext = createContext();
 
@@ -10,6 +11,7 @@ const initialState = {
   diagramSvgString: "",
   isAiEnabled: false,
   isGenerationInProgress: false,
+  isJavaAvailable: false,
 };
 
 function reducer(state, { type, payload }) {
@@ -26,6 +28,8 @@ function reducer(state, { type, payload }) {
       return { ...state, diagramSvgString: payload };
     case "reset":
       return { ...state, umlCode: "", prompt: "", diagramSvgString: "" };
+    case "setJavaAvailability":
+      return { ...state, isJavaAvailable: payload };
     default:
       throw new Error();
   }
@@ -33,9 +37,15 @@ function reducer(state, { type, payload }) {
 
 function EditorProvider({ children }) {
   const [currentValue, dispatcher] = useReducer(reducer, initialState);
+  const { eventBus } = useElectron();
 
   useSubscribe("ai:ready", (aiStatus) => {
     dispatcher({ type: "updateAiEnabled", payload: aiStatus });
+  });
+
+  useSubscribe("ai:generationCompleted", (uml) => {
+    dispatcher({ type: "updateUmlCode", payload: uml });
+    eventBus.send("diagram:generate", uml);
   });
 
   useSubscribe("diagram:generationStarted", () => {
@@ -49,6 +59,10 @@ function EditorProvider({ children }) {
 
   useSubscribe("diagram:generationFailed", () => {
     dispatcher({ type: "updateGenerationInProgress", payload: false });
+  });
+
+  useSubscribe("app:javaAvailable", (isJavaAvailabley) => {
+    dispatcher({ type: "setJavaAvailability", payload: isJavaAvailabley });
   });
 
   const updateUmlCode = function (value) {

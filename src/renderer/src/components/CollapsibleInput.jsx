@@ -33,14 +33,14 @@ function CollapsibleInput({
         </motion.div>
       ) : (
         <motion.div
-          className="flex flex-col h-full flex-grow"
+          className="flex flex-col h-full flex-grow gap-3"
           key={title + isCollapsed}
           initial={{ opacity: 0, width: "50px" }}
           animate={{ opacity: 1, width: "100%" }}
           exit={{ opacity: 0, width: "50px" }}
           transition={{ duration: 0.5 }}
         >
-          <p className="text-2xl font-bold">{title}</p>
+          <p className="w-full text-center text-4xl font-bold">{title}</p>
           <textarea
             className="flex-grow p-2 border border-gray-300 bg-slate-600 focus-visible:bg-slate-200 font-bold rounded-md resize-none disabled:opacity-50"
             value={value}
