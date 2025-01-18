@@ -1,11 +1,25 @@
 const getStream = require("get-stream");
 const execa = require("execa");
-import jar from "../../resources/plantuml.jar?asset";
+const { join } = require("path");
+// import jar from "../../resources/plantuml.jar?asset";
 
 const findComments = (text) => text.match(/<!--(.*?)-->/gms);
 
+const jarPath = () => {
+  if (process.env.NODE_ENV === "development") {
+    return join(process.cwd(), "resources", "plantuml.jar");
+  } else {
+    return join(
+      process.resourcesPath,
+      "app.asar.unpacked",
+      "resources",
+      "plantuml.jar",
+    );
+  }
+};
+
 const plantuml = async (uml) => {
-  const plantumlJar = jar;
+  const plantumlJar = jarPath();
   const subprocess = execa("java", [
     "-jar",
     "-Djava.awt.headless=true",
@@ -20,10 +34,12 @@ const plantuml = async (uml) => {
     subprocess.stdin.end();
   });
 
-  const promise = getStream(subprocess.stdout).then((svg) =>
-    (findComments(svg) || []).reduce(
-      (file, comment) => file.replace(comment, ""),
-      svg,
+  const promise = getStream(subprocess.stderr).then(() =>
+    getStream(subprocess.stdout).then((svg) =>
+      (findComments(svg) || []).reduce(
+        (file, comment) => file.replace(comment, ""),
+        svg,
+      ),
     ),
   );
 

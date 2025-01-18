@@ -33,7 +33,7 @@ app.whenReady().then(() => {
         mainWindow.send("diagram:generationCompleted", result);
       })
       .catch((err) => {
-        console.error(err);
+        console.error("error", err);
         mainWindow.send("diagram:generationFailed", "error");
       });
   });
