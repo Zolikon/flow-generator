@@ -26,7 +26,7 @@ app.whenReady().then(() => {
   ipcMain.on("ai:setAiApiKey", (_, key) => {
     aiApiKey = key;
     store.set("aiApiKey", key);
-    mainWindow.send("ai:ready", true);
+    mainWindow.send("ai:ready", !!key);
   });
 
   ipcMain.on("diagram:generate", (event, message) => {

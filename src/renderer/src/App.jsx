@@ -5,9 +5,11 @@ import AiStatus from "./AiStatus";
 import { useEditor } from "./EditorContext";
 import DiagramView from "./DiagramView";
 import ResetButton from "./components/ResetButton";
+import CollapsibleInput from "./components/CollapsibleInput";
 
 function App() {
   const { eventBus } = useElectron();
+  const [editorMode, setEditorMode] = useState("uml");
   const {
     isAiEnabled,
     updateUmlCode,
@@ -55,33 +57,37 @@ function App() {
   return (
     <>
       <div className="w-[100%] h-[100%] flex flex-col items-center justify-center gap-2 p-2 bg-gradient-to-br from-blue-600 to-blue-300">
-        <div className="flex gap-2 w-full flex-grow items-center justify-center">
+        <div className="flex gap-2 w-full h-full items-center justify-center">
+          {!isAiEnabled && (
+            <CollapsibleInput
+              title="UML mode"
+              value={currentUmlCode}
+              setValue={setCurrentUmlCode}
+              collapseDisabled
+            />
+          )}
           {isAiEnabled && (
-            <div className="flex flex-col gap-2 w-1/3 h-full">
-              <code className="font-extrabold  text-2xl h-8">
-                Generate by AI
-              </code>
-              <textarea
-                disabled={isGenerationInProgress}
+            <div className="flex w-[90%] h-full gap-3">
+              <CollapsibleInput
+                title="AI mode"
                 value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                className="flex-grow p-2 border border-gray-300 bg-slate-600 focus-visible:bg-slate-200 font-bold rounded-md resize-none disabled:opacity-50"
-                placeholder="Describe your diagram"
+                setValue={setPrompt}
+                isCollapsed={editorMode === "uml"}
+                setIsCollapsed={() => {
+                  setEditorMode("ai");
+                }}
               />
-              <code className="font-extrabold text-2xl  h-8"></code>
+              <CollapsibleInput
+                title="UML mode"
+                value={currentUmlCode}
+                setValue={setCurrentUmlCode}
+                isCollapsed={editorMode === "ai"}
+                setIsCollapsed={() => {
+                  setEditorMode("uml");
+                }}
+              />
             </div>
           )}
-          <div className="flex flex-col gap-2 w-1/3 h-full">
-            <code className="font-extrabold  text-2xl  h-8">@startuml</code>
-            <textarea
-              disabled={isGenerationInProgress}
-              value={currentUmlCode}
-              onChange={(e) => setCurrentUmlCode(e.target.value)}
-              className="flex-grow p-2 border border-gray-300 bg-slate-600 focus-visible:bg-slate-200 font-bold rounded-md resize-none disabled:opacity-50"
-              placeholder="UML code"
-            />
-            <code className="font-extrabold text-2xl  h-8">@enduml</code>
-          </div>
           <div className="flex flex-col items-center gap-2 w-1/3 h-full">
             <div className="h-1/2 w-full flex flex-col items-center justify-center gap-2 overflow-auto">
               <p className="font-extrabold text-2xl">Preview</p>
@@ -97,9 +103,10 @@ function App() {
             <Button
               onClick={generateDiagram}
               theme="blue"
+              size="large"
               disabled={isGenerationInProgress}
             >
-              <p>Generate</p>
+              <p>Generate with {editorMode.toUpperCase()}</p>
               <p className="material-symbols-outlined">check</p>
             </Button>
             <ResetButton onClick={resetEditor} />

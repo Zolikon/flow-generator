@@ -32,6 +32,12 @@ function AiStatus() {
     dialogRef.current.close();
   }
 
+  function deleteApiKey() {
+    eventBus.send("ai:setAiApiKey", "");
+    setApiKey("");
+    dialogRef.current.close();
+  }
+
   function closeDialog() {
     setApiKey("");
     dialogRef.current.close();
@@ -48,7 +54,7 @@ function AiStatus() {
       <dialog
         ref={dialogRef}
         onClick={handleBackdropClick}
-        className="w-1/3 h-1/3 rounded-lg m-auto p-2"
+        className="w-[50vw] lg:w-[33vw] h-[50vh] rounded-lg m-auto p-2"
       >
         <div className="h-full w-full flex flex-col items-center justify-between">
           <p className="font-extrabold text-2xl">
@@ -59,9 +65,12 @@ function AiStatus() {
             onChange={(e) => setApiKey(e.target.value)}
             placeholder="API Key"
           />
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-col lg:flex-row">
             <Button onClick={saveApiKey} disabled={!apiKey}>
               Save
+            </Button>
+            <Button onClick={deleteApiKey} disabled={!apiKey} theme="yellow">
+              <span className="material-symbols-outlined">delete</span>
             </Button>
             <Button onClick={closeDialog} theme="red">
               Cancel
