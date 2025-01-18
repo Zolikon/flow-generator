@@ -2,9 +2,11 @@ import { app, BrowserWindow, ipcMain } from "electron";
 import { optimizer } from "@electron-toolkit/utils";
 import { createWindow } from "./utils";
 import plantuml from "./platinum_local";
+import Store from "electron-store";
 
 let mainWindow;
-let aiApiKey = "";
+const store = new Store();
+let aiApiKey = store.get("aiApiKey", "");
 
 app.whenReady().then(() => {
   mainWindow = createWindow();
@@ -23,6 +25,7 @@ app.whenReady().then(() => {
 
   ipcMain.on("ai:setAiApiKey", (_, key) => {
     aiApiKey = key;
+    store.set("aiApiKey", key);
     mainWindow.send("ai:ready", true);
   });
 

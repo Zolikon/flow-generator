@@ -4,8 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import AiStatus from "./AiStatus";
 import { useEditor } from "./EditorContext";
 import DiagramView from "./DiagramView";
-
-const startValue = `a->b:test`;
+import ResetButton from "./components/ResetButton";
 
 function App() {
   const { eventBus } = useElectron();
@@ -18,7 +17,7 @@ function App() {
     diagramSvgString,
   } = useEditor();
   const [prompt, setPrompt] = useState("");
-  const [currentUmlCode, setCurrentUmlCode] = useState(startValue);
+  const [currentUmlCode, setCurrentUmlCode] = useState("");
   const imageRef = useRef(null);
 
   const dialogRef = useRef(null);
@@ -45,10 +44,10 @@ function App() {
   };
 
   const resetEditor = () => {
-    if (confirm("Are you sure you want to reset the editor?")) {
-      setCurrentUmlCode("");
-      setPrompt("");
-      reset();
+    setCurrentUmlCode("");
+    setPrompt("");
+    reset();
+    if (imageRef.current) {
       imageRef.current.innerHTML = "";
     }
   };
@@ -66,7 +65,7 @@ function App() {
                 disabled={isGenerationInProgress}
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                className="flex-grow p-2 border border-gray-300 bg-opacity-50 font-bold rounded-md resize-none disabled:opacity-50"
+                className="flex-grow p-2 border border-gray-300 bg-slate-600 focus-visible:bg-slate-200 font-bold rounded-md resize-none disabled:opacity-50"
                 placeholder="Describe your diagram"
               />
               <code className="font-extrabold text-2xl  h-8"></code>
@@ -78,7 +77,7 @@ function App() {
               disabled={isGenerationInProgress}
               value={currentUmlCode}
               onChange={(e) => setCurrentUmlCode(e.target.value)}
-              className="flex-grow p-2 border border-gray-300 bg-opacity-50 font-bold rounded-md resize-none disabled:opacity-50"
+              className="flex-grow p-2 border border-gray-300 bg-slate-600 focus-visible:bg-slate-200 font-bold rounded-md resize-none disabled:opacity-50"
               placeholder="UML code"
             />
             <code className="font-extrabold text-2xl  h-8">@enduml</code>
@@ -103,14 +102,7 @@ function App() {
               <p>Generate</p>
               <p className="material-symbols-outlined">check</p>
             </Button>
-            <Button
-              disabled={currentUmlCode === startValue}
-              onClick={resetEditor}
-              theme="red"
-            >
-              <p>Reset</p>
-              <p className="material-symbols-outlined">close</p>
-            </Button>
+            <ResetButton onClick={resetEditor} />
           </div>
         </div>
       </div>
