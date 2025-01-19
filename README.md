@@ -14,14 +14,14 @@ Plantuml editor with AI support
 
 ## Stack
 
-ElectronJs
-ReactJs
-PlantUml
-Java
+- ElectronJs
+- ReactJs
+- PlantUml
+- Java (to run PlantUml)
 
 ## Requirements
 
-Needs Java JRE installed on local
+Needs Java JRE installed on local to use PlantUml
 
 ## Run
 
