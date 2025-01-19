@@ -1,4 +1,3 @@
-import { AnimatePresence, motion } from "motion/react";
 import PropTypes from "prop-types";
 
 function CollapsibleInput({
@@ -11,14 +10,10 @@ function CollapsibleInput({
   setIsCollapsed = () => {},
 }) {
   return (
-    <AnimatePresence mode="popLayout">
+    <>
       {!collapseDisabled && isCollapsed ? (
-        <motion.div
+        <div
           key={title + isCollapsed}
-          initial={{ opacity: 0, width: "100%" }}
-          animate={{ opacity: 1, width: "50px" }}
-          exit={{ opacity: 0, width: "100%" }}
-          transition={{ duration: 0.5 }}
           className="flex flex-col items-start h-full w-[50px] bg-teal-400 text-slate-700 hover:bg-teal-600 cursor-pointer rounded-md hover:text-slate-200 py-10 transition-colors duration-300"
           onClick={() => setIsCollapsed(false)}
         >
@@ -30,15 +25,11 @@ function CollapsibleInput({
               {char === " " ? "\u00A0" : char}
             </span>
           ))}
-        </motion.div>
+        </div>
       ) : (
-        <motion.div
+        <div
           className="flex flex-col h-full flex-grow gap-3"
           key={title + isCollapsed}
-          initial={{ opacity: 0, width: "50px" }}
-          animate={{ opacity: 1, width: "100%" }}
-          exit={{ opacity: 0, width: "50px" }}
-          transition={{ duration: 0.5 }}
         >
           <p className="w-full text-center text-4xl font-bold">{title}</p>
           <textarea
@@ -47,9 +38,9 @@ function CollapsibleInput({
             onChange={(e) => setValue(e.target.value)}
             disabled={disabled}
           />
-        </motion.div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 }
 

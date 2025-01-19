@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 import Button from "./Button";
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
 
 function ResetButton({ onClick }) {
   const [isResetting, setIsResetting] = useState(false);
@@ -24,30 +23,16 @@ function ResetButton({ onClick }) {
   }, [isResetting]);
 
   return (
-    <AnimatePresence mode="popLayout">
+    <>
       {!isResetting && (
-        <motion.div
-          key="button"
-          className="flex gap-2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
-        >
+        <div key="button" className="flex gap-2">
           <Button onClick={() => setIsResetting(true)} theme="red">
             Reset
           </Button>
-        </motion.div>
+        </div>
       )}
       {isResetting && (
-        <motion.div
-          key="confirm"
-          className="flex gap-2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
-        >
+        <div key="confirm" className="flex gap-2">
           <Button
             onClick={() => {
               setIsResetting(false);
@@ -65,9 +50,9 @@ function ResetButton({ onClick }) {
           >
             Confirm
           </Button>
-        </motion.div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 }
 

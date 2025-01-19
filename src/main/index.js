@@ -4,7 +4,6 @@ import { createWindow, isJavaInstalled } from "./utils";
 import plantuml from "./platinum_local";
 import Store from "electron-store";
 import { callChatGPT, setupOpenAI } from "./ai_client";
-import { main } from "motion/react-client";
 
 let mainWindow;
 const store = new Store();
