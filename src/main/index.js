@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, Menu } from "electron";
 import { optimizer } from "@electron-toolkit/utils";
 import { createWindow, isJavaInstalled } from "./utils";
 import plantuml from "./platinum_local";
@@ -14,9 +14,11 @@ if (aiApiKey) {
 
 app.whenReady().then(() => {
   mainWindow = createWindow();
-
   mainWindow.on("ready-to-show", () => {
-    mainWindow.setTitle("Flow generator");
+    mainWindow.setTitle("Flow generator " + app.getVersion());
+    if (process.env.NODE_ENV !== "development") {
+      Menu.setApplicationMenu(null);
+    }
     mainWindow.send("app:javaAvailable", isJavaInstalled());
     mainWindow.send("ai:ready", !!aiApiKey);
   });

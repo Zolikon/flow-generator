@@ -1,34 +1,44 @@
-# electron-template
+# Flow generator
 
-An Electron application with React
+Plantuml editor with AI support
 
-## Recommended IDE Setup
+## Features
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+- Full support for PlantUML diagrams
+- Prompt-based generation for diagrams (needs personal API key, not part of setup)
+- Save for later:
+  - diagram definition
+  - prompt + diagram definition
+  - diagram as svg
+- Copy diagram to clipboard
 
-## Project Setup
+## Stack
 
-### Install
+ElectronJs
+ReactJs
+PlantUml
+Java
+
+## Requirements
+
+Needs Java JRE installed on local
+
+## Run
 
 ```bash
-$ npm install
+npm install
 ```
-
-### Development
 
 ```bash
-$ npm run dev
+npm run dev
 ```
 
-### Build
+## Build
+
+_Tested for Windows only_
 
 ```bash
-# For windows
-$ npm run build:win
-
-# For macOS
-$ npm run build:mac
-
-# For Linux
-$ npm run build:linux
+npm run build:win
 ```
+
+run installer in dist folder
