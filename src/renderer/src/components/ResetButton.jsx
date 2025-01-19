@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import Button from "./Button";
 import { useEffect, useState } from "react";
 
-function ResetButton({ onClick }) {
+function ResetButton({ onClick, disabled }) {
   const [isResetting, setIsResetting] = useState(false);
   const [timeoutId, setTimeoutId] = useState(null);
 
@@ -26,7 +26,11 @@ function ResetButton({ onClick }) {
     <>
       {!isResetting && (
         <div key="button" className="flex gap-2">
-          <Button onClick={() => setIsResetting(true)} theme="red">
+          <Button
+            onClick={() => setIsResetting(true)}
+            theme="red"
+            disabled={disabled}
+          >
             Reset
           </Button>
         </div>
@@ -48,7 +52,7 @@ function ResetButton({ onClick }) {
             }}
             theme="red"
           >
-            Confirm
+            Reset
           </Button>
         </div>
       )}
@@ -58,6 +62,7 @@ function ResetButton({ onClick }) {
 
 ResetButton.propTypes = {
   onClick: PropTypes.func.isRequired,
+  disabled: PropTypes.bool,
 };
 
 export default ResetButton;

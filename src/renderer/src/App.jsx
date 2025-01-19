@@ -1,4 +1,3 @@
-import { useElectron } from "./useElectron";
 import Button from "./components/Button";
 import { useEffect, useRef, useState } from "react";
 import AiStatus from "./AiStatus";
@@ -6,25 +5,42 @@ import { useEditor } from "./EditorContext";
 import DiagramView from "./DiagramView";
 import ResetButton from "./components/ResetButton";
 import CollapsibleInput from "./components/CollapsibleInput";
+import { useSubscribe } from "./useSubsribe";
+import GenerationStatus from "./GenerationStatus";
+import UMLHelp from "./UMLHelp";
+import AIHelp from "./AIHelp";
+import SaveButton from "./components/SaveButton";
+import LoadButton from "./components/LoadButton";
 
 function App() {
-  const { eventBus } = useElectron();
   const [editorMode, setEditorMode] = useState("uml");
   const {
     isAiEnabled,
-    updateUmlCode,
-    updatePrompt,
     reset,
     isGenerationInProgress,
     diagramSvgString,
-    umlCode,
     isJavaAvailable,
+    generateUsingAi,
+    generateUsingUml,
   } = useEditor();
   const [prompt, setPrompt] = useState("");
-  const [currentUmlCode, setCurrentUmlCode] = useState(umlCode || "");
+  const [promptForPreviousGeneration, setPromptForPreviousGeneration] =
+    useState(prompt);
+  const [currentUmlCode, setCurrentUmlCode] = useState("");
+  const [umlForPreviousGeneration, setUmlForPreviousGeneration] =
+    useState(currentUmlCode);
   const imageRef = useRef(null);
 
   const dialogRef = useRef(null);
+
+  useSubscribe("ai:generationCompleted", (diagram) => {
+    setCurrentUmlCode(diagram);
+  });
+
+  useSubscribe("diagram:generationCompleted", () => {
+    setPromptForPreviousGeneration(prompt);
+    setUmlForPreviousGeneration(currentUmlCode);
+  });
 
   useEffect(() => {
     if (diagramSvgString) {
@@ -33,13 +49,19 @@ function App() {
   }, [diagramSvgString]);
 
   function generateDiagram() {
-    updateUmlCode(currentUmlCode);
-    eventBus.send("diagram:generate", `@startuml\n${currentUmlCode}\n@enduml`);
+    generateUsingUml(currentUmlCode);
+  }
+
+  function updatePrompt(value) {
+    setPrompt(value);
+  }
+
+  function updateUml(value) {
+    setCurrentUmlCode(value);
   }
 
   function generateAiDiagram() {
-    updatePrompt(prompt);
-    eventBus.send("ai:generate", prompt);
+    generateUsingAi(prompt, currentUmlCode);
   }
 
   const handleBackdropClick = (event) => {
@@ -53,11 +75,22 @@ function App() {
 
   const resetEditor = () => {
     setCurrentUmlCode("");
+    setPromptForPreviousGeneration("");
+    setUmlForPreviousGeneration("");
     setPrompt("");
     reset();
     if (imageRef.current) {
       imageRef.current.innerHTML = "";
     }
+  };
+
+  const loadFromJson = (input) => {
+    resetEditor();
+    const json = JSON.parse(input);
+    setCurrentUmlCode(json.uml);
+    setPrompt(json.prompt);
+    setPromptForPreviousGeneration("");
+    setUmlForPreviousGeneration("");
   };
 
   return (
@@ -73,8 +106,9 @@ function App() {
             <CollapsibleInput
               title="UML mode"
               value={currentUmlCode}
-              setValue={setCurrentUmlCode}
+              setValue={(event) => updateUml(event.target.value)}
               collapseDisabled
+              help={<UMLHelp />}
             />
           )}
           {isAiEnabled && (
@@ -82,36 +116,63 @@ function App() {
               <CollapsibleInput
                 title="AI mode"
                 value={prompt}
-                setValue={setPrompt}
+                setValue={updatePrompt}
+                disabled={isGenerationInProgress}
+                changedSinceGeneration={prompt !== promptForPreviousGeneration}
                 isCollapsed={editorMode === "uml"}
-                setIsCollapsed={() => {
+                triggerOpen={() => {
                   setEditorMode("ai");
                 }}
-              />
+                triggerCollapse={() => {
+                  setEditorMode("uml");
+                }}
+                help={<AIHelp />}
+              >
+                <span className="h-[90%] w-10 m-2 flex items-center justify-center hover:bg-slate-400 rounded-md cursor-pointer">
+                  UML
+                </span>
+              </CollapsibleInput>
               <CollapsibleInput
                 title="UML mode"
                 value={currentUmlCode}
-                setValue={setCurrentUmlCode}
+                setValue={updateUml}
+                disabled={isGenerationInProgress}
+                changedSinceGeneration={
+                  currentUmlCode !== umlForPreviousGeneration
+                }
                 isCollapsed={editorMode === "ai"}
-                setIsCollapsed={() => {
+                triggerOpen={() => {
                   setEditorMode("uml");
                 }}
+                triggerCollapse={() => {
+                  setEditorMode("ai");
+                }}
+                help={<UMLHelp />}
               />
             </div>
           )}
           {isJavaAvailable && (
             <div className="flex flex-col items-center gap-2 w-1/3 h-full">
               <div className="h-1/2 w-full flex flex-col items-center justify-center gap-2 overflow-auto">
-                <p className="font-extrabold text-2xl">Preview</p>
-                {diagramSvgString && (
-                  <div
-                    className="overflow-auto max-h-[80%] flex-grow w-full flex flex-col items-center justify-center border-2 border-gray-300 rounded-md cursor-zoom-in relative"
-                    onClick={() => dialogRef.current.showModal()}
-                  >
-                    <div ref={imageRef}></div>
-                  </div>
+                {isGenerationInProgress ? (
+                  <GenerationStatus />
+                ) : (
+                  <>
+                    <p className="font-extrabold text-2xl">
+                      {diagramSvgString ? "Preview" : "No generated diagram"}
+                    </p>
+                    {diagramSvgString && (
+                      <div
+                        className="overflow-auto max-h-[80%] flex-grow w-full flex flex-col items-center justify-center border-2 border-gray-300 rounded-md cursor-zoom-in relative"
+                        onClick={() => dialogRef.current.showModal()}
+                      >
+                        <div ref={imageRef}></div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
+              <LoadButton loader={loadFromJson} />
               <Button
                 onClick={
                   editorMode === "uml" ? generateDiagram : generateAiDiagram
@@ -128,7 +189,28 @@ function App() {
                   refresh
                 </p>
               </Button>
-              <ResetButton onClick={resetEditor} />
+
+              <ResetButton
+                onClick={resetEditor}
+                disabled={
+                  isGenerationInProgress ||
+                  (!currentUmlCode && !prompt && !diagramSvgString)
+                }
+              />
+              {diagramSvgString && (
+                <div className="flex flex-col gap-2 m-auto items-center justify-center border-2 border-gray-300 rounded-md p-2 bg-slate-300">
+                  <SaveButton title="UML" content={{ uml: currentUmlCode }} />
+                  <SaveButton
+                    title="Prompt + UML"
+                    content={{ uml: currentUmlCode, prompt }}
+                  />
+                  <SaveButton
+                    title="SVG"
+                    content={diagramSvgString}
+                    type="svg"
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>

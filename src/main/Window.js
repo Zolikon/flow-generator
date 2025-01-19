@@ -6,10 +6,10 @@ export class Window extends BrowserWindow {
       width: 900,
       height: 670,
       show: false,
-      title: "Flow generator",
       webPreferences: {
         preload: `${__dirname}/../preload/index.js`,
         sandbox: false,
+        spellcheck: false,
       },
       ...options,
     });

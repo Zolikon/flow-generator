@@ -25,9 +25,9 @@ function Button({
     <button
       disabled={disabled}
       onClick={onClick}
-      className={`${resolveTheme(theme)}  ${resolveSize(size)} text-white font-bold py-2 px-4 rounded group select-none`}
+      className={`${resolveTheme(theme)}  ${resolveSize(size)} text-white font-bold py-2 px-4 rounded group select-none transition-all duration-200`}
     >
-      <div className="flex justify-center items-center w-full h-full group-hover:scale-125 group-disabled:group-hover:scale-100 group-disabled:cursor-default tranistion-all duration-300">
+      <div className="flex justify-center items-center w-full h-full group-hover:scale-110 group-disabled:group-hover:scale-100 group-disabled:cursor-default tranistion-all duration-300">
         {children}
       </div>
     </button>

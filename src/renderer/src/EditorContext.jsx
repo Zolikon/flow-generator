@@ -6,28 +6,34 @@ import { useElectron } from "./useElectron";
 const EditorContext = createContext();
 
 const initialState = {
-  umlCode: "",
-  prompt: "",
   diagramSvgString: "",
   isAiEnabled: false,
-  isGenerationInProgress: false,
+  isGenerationTypeAi: false,
+  isAiGenerationInProgress: false,
+  isDiagramGenerationInProgress: false,
   isJavaAvailable: false,
 };
 
 function reducer(state, { type, payload }) {
   switch (type) {
-    case "updateUmlCode":
-      return { ...state, umlCode: payload };
-    case "updatePrompt":
-      return { ...state, prompt: payload };
     case "updateAiEnabled":
       return { ...state, isAiEnabled: payload };
-    case "updateGenerationInProgress":
-      return { ...state, isGenerationInProgress: payload };
+    case "updateDiagramGenerationInProgress":
+      return { ...state, isDiagramGenerationInProgress: payload };
+    case "updateAiGenerationInProgress":
+      return { ...state, isAiGenerationInProgress: payload };
+    case "updateIsGenerationTypeAi":
+      return { ...state, isGenerationTypeAi: payload };
     case "updateDiagramSvgString":
       return { ...state, diagramSvgString: payload };
     case "reset":
-      return { ...state, umlCode: "", prompt: "", diagramSvgString: "" };
+      return {
+        ...state,
+        isGenerationTypeAi: false,
+        isAiGenerationInProgress: false,
+        isDiagramGenerationInProgress: false,
+        diagramSvgString: "",
+      };
     case "setJavaAvailability":
       return { ...state, isJavaAvailable: payload };
     default:
@@ -44,45 +50,53 @@ function EditorProvider({ children }) {
   });
 
   useSubscribe("ai:generationCompleted", (uml) => {
-    dispatcher({ type: "updateUmlCode", payload: uml });
-    eventBus.send("diagram:generate", uml);
+    dispatcher({ type: "updateAiGenerationInProgress", payload: false });
+    generateUsingUml(uml);
   });
 
   useSubscribe("diagram:generationStarted", () => {
-    dispatcher({ type: "updateGenerationInProgress", payload: true });
+    dispatcher({ type: "updateDiagramGenerationInProgress", payload: true });
   });
 
   useSubscribe("diagram:generationCompleted", (svg) => {
     dispatcher({ type: "updateDiagramSvgString", payload: svg });
-    dispatcher({ type: "updateGenerationInProgress", payload: false });
+    dispatcher({ type: "updateDiagramGenerationInProgress", payload: false });
+    dispatcher({ type: "updateIsGenerationTypeAi", payload: false });
   });
 
   useSubscribe("diagram:generationFailed", () => {
-    dispatcher({ type: "updateGenerationInProgress", payload: false });
+    dispatcher({ type: "updateDiagramGenerationInProgress", payload: false });
   });
 
   useSubscribe("app:javaAvailable", (isJavaAvailabley) => {
     dispatcher({ type: "setJavaAvailability", payload: isJavaAvailabley });
   });
 
-  const updateUmlCode = function (value) {
-    dispatcher({ type: "updateUmlCode", payload: value });
-  };
-
-  const updatePrompt = function (value) {
-    dispatcher({ type: "updatePrompt", payload: value });
-  };
-
   const reset = function () {
+    eventBus.send("reset");
     dispatcher({ type: "reset" });
+  };
+
+  const generateUsingUml = function (uml) {
+    dispatcher({ type: "updateDiagramGenerationInProgress", payload: true });
+    eventBus.send("diagram:generate", uml);
+  };
+
+  const generateUsingAi = function (prompt, uml) {
+    dispatcher({ type: "updateAiGenerationInProgress", payload: true });
+    dispatcher({ type: "updateIsGenerationTypeAi", payload: true });
+    eventBus.send("ai:generate", { prompt, uml });
   };
 
   return (
     <EditorContext.Provider
       value={{
         ...currentValue,
-        updateUmlCode,
-        updatePrompt,
+        isGenerationInProgress:
+          currentValue.isAiGenerationInProgress ||
+          currentValue.isDiagramGenerationInProgress,
+        generateUsingAi,
+        generateUsingUml,
         reset,
       }}
     >

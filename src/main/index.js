@@ -16,6 +16,7 @@ app.whenReady().then(() => {
   mainWindow = createWindow();
 
   mainWindow.on("ready-to-show", () => {
+    mainWindow.setTitle("Flow generator");
     mainWindow.send("app:javaAvailable", isJavaInstalled());
     mainWindow.send("ai:ready", !!aiApiKey);
   });
@@ -39,6 +40,11 @@ app.whenReady().then(() => {
 
   ipcMain.on("ai:generate", (event, message) => {
     mainWindow.send("diagram:generationStarted");
+    message = message.prompt.replaceAll(
+      "${diagram}",
+      `\n\`\`\`plantml\n${message.uml}\n\`\`\`\n`,
+    );
+
     callChatGPT(message)
       .then((result) => mainWindow.send("ai:generationCompleted", result))
       .catch((err) => {
@@ -49,6 +55,7 @@ app.whenReady().then(() => {
 
   ipcMain.on("diagram:generate", (event, message) => {
     mainWindow.send("diagram:generationStarted");
+
     plantuml(message)
       .then((result) => {
         mainWindow.send("diagram:generationCompleted", result);
