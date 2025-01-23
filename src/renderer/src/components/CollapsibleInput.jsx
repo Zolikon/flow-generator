@@ -14,12 +14,24 @@ function CollapsibleInput({
   help,
   triggerOpen = () => {},
   triggerCollapse = () => {},
+  executeOnCtrlEnter = () => {},
 }) {
   const dialogRef = useRef(null);
 
   const handleBackdropClick = (event) => {
     if (event.target === dialogRef.current) {
       dialogRef.current.close();
+    }
+  };
+
+  const onKeyDown = (e) => {
+    if (e.key === "Tab") {
+      e.preventDefault();
+      triggerCollapse();
+    }
+    if (e.ctrlKey && e.key === "Enter") {
+      e.preventDefault();
+      executeOnCtrlEnter();
     }
   };
 
@@ -52,17 +64,13 @@ function CollapsibleInput({
           </p>
           <div className="flex-grow flex flex-col relative">
             <textarea
+              placeholder="Generate CTRL+Enter"
               autoFocus
               className="h-full w-full p-2 bg-slate-200 font-bold rounded-md resize-none disabled:opacity-50 transition-all duration-300"
               value={value}
               onChange={(e) => setValue(e.target.value)}
               disabled={disabled}
-              onKeyDown={(e) => {
-                if (e.key === "Tab") {
-                  e.preventDefault();
-                  triggerCollapse();
-                }
-              }}
+              onKeyDown={onKeyDown}
             />
             <div className="absolute right-2 bottom-2 flex gap-2">
               <IconButton
@@ -107,6 +115,7 @@ CollapsibleInput.propTypes = {
   help: PropTypes.node.isRequired,
   triggerOpen: PropTypes.func,
   triggerCollapse: PropTypes.func,
+  executeOnCtrlEnter: PropTypes.func,
 };
 
 export default CollapsibleInput;

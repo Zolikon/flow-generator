@@ -104,16 +104,19 @@ function App() {
         <div className="flex gap-2 w-full h-full items-center justify-center">
           {!isAiEnabled && (
             <CollapsibleInput
+              key="uml_no_ai"
               title="UML mode"
               value={currentUmlCode}
-              setValue={(event) => updateUml(event.target.value)}
+              setValue={updateUml}
               collapseDisabled
               help={<UMLHelp />}
+              executeOnCtrlEnter={generateDiagram}
             />
           )}
           {isAiEnabled && (
             <div className="flex w-[90%] h-full gap-3">
               <CollapsibleInput
+                key="ai"
                 title="AI mode"
                 value={prompt}
                 setValue={updatePrompt}
@@ -127,12 +130,14 @@ function App() {
                   setEditorMode("uml");
                 }}
                 help={<AIHelp />}
+                executeOnCtrlEnter={generateAiDiagram}
               >
                 <span className="h-[90%] w-10 m-2 flex items-center justify-center hover:bg-slate-400 rounded-md cursor-pointer">
                   UML
                 </span>
               </CollapsibleInput>
               <CollapsibleInput
+                key="uml_with_ai"
                 title="UML mode"
                 value={currentUmlCode}
                 setValue={updateUml}
@@ -148,6 +153,7 @@ function App() {
                   setEditorMode("ai");
                 }}
                 help={<UMLHelp />}
+                executeOnCtrlEnter={generateDiagram}
               />
             </div>
           )}

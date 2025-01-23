@@ -36,6 +36,7 @@ npm run dev
 ## Build
 
 _Tested for Windows only_
+_Requires admin mode_
 
 ```bash
 npm run build:win
