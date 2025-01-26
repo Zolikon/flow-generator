@@ -1,6 +1,6 @@
 {
   "name": "flow-generator",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "AI-supported flow diagram generator and editor",
   "main": "./out/main/index.js",
   "author": "example.com",
