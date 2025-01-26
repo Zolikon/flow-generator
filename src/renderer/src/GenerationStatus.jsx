@@ -1,3 +1,4 @@
+import { CircleLoader, HashLoader } from "react-spinners";
 import { useEditor } from "./EditorContext";
 
 function GenerationStatus() {
@@ -7,26 +8,28 @@ function GenerationStatus() {
     isDiagramGenerationInProgress,
   } = useEditor();
   return (
-    <div className="h-full w-1/2 flex flex-col items-center justify-center gap-2 select-none">
-      <p className="text-center text-xl font-bold">Magic is happening...</p>
+    <div className="h-full w-1/2 flex flex-col items-center justify-center gap-2 select-none text-sm">
+      <p className="text-center text-xl font-bold h-[50px]">
+        Magic is happening...
+      </p>
       {isGenerationTypeAi && (
         <div className="flex items-center justify-between w-full">
-          <p>AI trying to understand us</p>
-          {isAiGenerationInProgress ? <Spinner /> : <span>✅</span>}
+          <p className=" whitespace-nowrap">AI</p>
+          {isAiGenerationInProgress ? (
+            <HashLoader size={25} />
+          ) : (
+            <span>✅</span>
+          )}
         </div>
       )}
-      {isDiagramGenerationInProgress && (
-        <div className="flex items-center justify-between w-full">
-          <p>Picturing the code</p>
-          <Spinner />
+      {isDiagramGenerationInProgress && !isAiGenerationInProgress && (
+        <div className="flex items-center justify-between w-full h-[50px]">
+          <p className=" whitespace-nowrap">Diagram</p>
+          <HashLoader size={25} />
         </div>
       )}
     </div>
   );
-}
-
-function Spinner() {
-  return <div className="h-[70%] w-[3px] bg-black animate-spin m-2" />;
 }
 
 export default GenerationStatus;

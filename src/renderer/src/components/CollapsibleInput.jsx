@@ -56,7 +56,7 @@ function CollapsibleInput({
         </div>
       ) : (
         <div
-          className="flex flex-col h-full flex-grow gap-3"
+          className="flex flex-col h-full flex-grow gap-3 bg-teal-400 p-2 rounded-md"
           key={title + isCollapsed}
         >
           <p className="w-full text-center text-4xl font-bold">
