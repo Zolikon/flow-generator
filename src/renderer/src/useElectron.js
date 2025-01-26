@@ -1,9 +1,9 @@
 export function useElectron() {
-  function query(event, onResponse) {
+  function query(event, onResponse, params = {}) {
     window.electron.ipcRenderer.once(event, (_, response) => {
       onResponse(response);
     });
-    window.electron.ipcRenderer.send(event);
+    window.electron.ipcRenderer.send(event, params);
   }
 
   return {

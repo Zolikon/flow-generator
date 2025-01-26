@@ -1,20 +1,20 @@
 import PropTypes from "prop-types";
 import Button from "./Button";
 
-function SaveButton({ title, content, type = "json" }) {
-  function isJsonType() {
-    return type === "json";
+function SaveButton({ title, content, type = "flow" }) {
+  function isFlowType() {
+    return type === "flow";
   }
 
   const handleButtonClick = () => {
     const options = {
-      suggestedName: isJsonType() ? "diagram.json" : "diagram.svg",
+      suggestedName: isFlowType() ? "diagram.flow" : "diagram.svg",
       types: [
         {
-          description: isJsonType() ? title + " diagram" : "Svg image",
-          accept: isJsonType()
+          description: isFlowType() ? title + " diagram" : "Svg image",
+          accept: isFlowType()
             ? {
-                "application/json": [".json"],
+                "application/json": [".flow"],
               }
             : {
                 "image/svg+xml": [".svg"],
@@ -28,7 +28,11 @@ function SaveButton({ title, content, type = "json" }) {
       .then((fileHandle) => fileHandle.createWritable())
       .then((fileWritable) => {
         const writer = fileWritable.getWriter();
-        writer.write(isJsonType() ? JSON.stringify(content, null, 2) : content);
+        if (isFlowType()) {
+          content.uml = content.uml ? content.uml.split("\n") : [];
+          content.prompt = content.prompt ? content.prompt.split("\n") : [];
+        }
+        writer.write(isFlowType() ? JSON.stringify(content, null, 2) : content);
         writer.close();
       })
       .catch(() => {
@@ -49,7 +53,7 @@ function SaveButton({ title, content, type = "json" }) {
 SaveButton.propTypes = {
   title: PropTypes.string.isRequired,
   content: PropTypes.oneOfType([PropTypes.object, PropTypes.string]).isRequired,
-  type: PropTypes.oneOf(["json", "svg"]),
+  type: PropTypes.oneOf(["flow", "svg"]),
 };
 
 export default SaveButton;

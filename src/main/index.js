@@ -3,7 +3,7 @@ import { optimizer } from "@electron-toolkit/utils";
 import { createWindow, isJavaInstalled } from "./utils";
 import plantuml from "./platinum_local";
 import Store from "electron-store";
-import { callChatGPT, setupOpenAI } from "./ai_client";
+import { callChatGPT, setupOpenAI, testAiConnection } from "./ai_client";
 
 let mainWindow;
 const store = new Store();
@@ -29,6 +29,16 @@ app.whenReady().then(() => {
 
   ipcMain.on("query:getAiApiKey", () => {
     mainWindow.send("query:getAiApiKey", aiApiKey);
+  });
+
+  ipcMain.on("query:isAiWorking", (event, { key }) => {
+    testAiConnection(key)
+      .then((result) => {
+        mainWindow.send("query:isAiWorking", result);
+      })
+      .catch(() => {
+        mainWindow.send("query:isAiWorking", false);
+      });
   });
 
   ipcMain.on("ai:setAiApiKey", (_, key) => {

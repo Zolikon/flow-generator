@@ -84,11 +84,11 @@ function App() {
     }
   };
 
-  const loadFromJson = (input) => {
+  const loadFromFlowFile = (input) => {
     resetEditor();
     const json = JSON.parse(input);
-    setCurrentUmlCode(json.uml);
-    setPrompt(json.prompt);
+    setCurrentUmlCode(json.uml ? json.uml.join("\n") : "");
+    setPrompt(json.prompt ? json.prompt.join("\n") : "");
     setPromptForPreviousGeneration("");
     setUmlForPreviousGeneration("");
   };
@@ -172,13 +172,16 @@ function App() {
                         className="overflow-auto max-h-[80%] flex-grow w-full flex flex-col items-center justify-center border-2 border-gray-300 rounded-md cursor-zoom-in relative"
                         onClick={() => dialogRef.current.showModal()}
                       >
-                        <div ref={imageRef}></div>
+                        <div
+                          className="h-full p-2 select-none"
+                          ref={imageRef}
+                        ></div>
                       </div>
                     )}
                   </>
                 )}
               </div>
-              <LoadButton loader={loadFromJson} />
+              <LoadButton loader={loadFromFlowFile} />
               <Button
                 onClick={
                   editorMode === "uml" ? generateDiagram : generateAiDiagram

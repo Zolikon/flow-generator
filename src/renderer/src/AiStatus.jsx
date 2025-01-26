@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useEditor } from "./EditorContext";
 import { useElectron } from "./useElectron";
 import Button from "./components/Button";
@@ -7,14 +7,26 @@ import PasswordInput from "./components/PasswordInput";
 function AiStatus() {
   const { isAiEnabled } = useEditor();
   const [initialApiKey, setInitialApiKey] = useState("");
+  const [isWorking, setIsWorking] = useState(false);
+  const [testedApiKey, setTestedApiKey] = useState("");
+  const [aiCheckInProgress, setAiCheckInProgress] = useState(false);
   const [apiKey, setApiKey] = useState("");
   const dialogRef = useRef(null);
 
   const { eventBus } = useElectron();
 
+  useEffect(() => {
+    if (apiKey === testedApiKey) {
+      setIsWorking(true);
+    } else {
+      setIsWorking(false);
+    }
+  }, [apiKey, testedApiKey]);
+
   function openDialog() {
     eventBus.query("query:getAiApiKey", (key) => {
       setApiKey(key);
+      setTestedApiKey(key);
       setInitialApiKey(key);
       dialogRef.current.showModal();
     });
@@ -25,6 +37,23 @@ function AiStatus() {
       dialogRef.current.close();
     }
   };
+
+  function startAiTest() {
+    setIsWorking(false);
+    setAiCheckInProgress(true);
+    eventBus.query(
+      "query:isAiWorking",
+      (isWorking) => {
+        console.log("isWorking", isWorking);
+        setIsWorking(isWorking);
+        setAiCheckInProgress(false);
+        if (isWorking) {
+          setTestedApiKey(apiKey);
+        }
+      },
+      { key: apiKey },
+    );
+  }
 
   function saveApiKey() {
     eventBus.send("ai:setAiApiKey", apiKey);
@@ -60,15 +89,32 @@ function AiStatus() {
           <p className="font-extrabold text-2xl">
             {initialApiKey ? "Update API Key" : "Configure API Key"}
           </p>
-          <PasswordInput
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            placeholder="API Key"
-          />
+          <div className="flex flex-col items-center gap-2">
+            <PasswordInput
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              placeholder="API Key"
+            />
+            <div className="flex items-center gap-2">
+              <p>Key status</p>
+              <span className="material-symbols-outlined ">
+                {isWorking ? "check" : "cancel"}
+              </span>
+            </div>
+          </div>
           <div className="flex gap-2 flex-col lg:flex-row">
-            <Button onClick={saveApiKey} disabled={!apiKey}>
-              Save
-            </Button>
+            {isWorking ? (
+              <Button onClick={saveApiKey} disabled={!apiKey}>
+                Save
+              </Button>
+            ) : (
+              <Button
+                disabled={!apiKey || aiCheckInProgress}
+                onClick={startAiTest}
+              >
+                {aiCheckInProgress ? "Testing..." : "Test"}
+              </Button>
+            )}
             <Button onClick={deleteApiKey} disabled={!apiKey} theme="yellow">
               <span className="material-symbols-outlined">delete</span>
             </Button>

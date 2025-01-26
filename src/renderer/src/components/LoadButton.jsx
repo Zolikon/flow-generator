@@ -8,6 +8,7 @@ function LoadButton({ loader }) {
     <>
       <Button
         onClick={() => {
+          inputRef.current.value = "";
           inputRef.current.click();
         }}
         theme="blue"
@@ -18,6 +19,7 @@ function LoadButton({ loader }) {
       </Button>
       <input
         type="file"
+        accept=".flow"
         ref={inputRef}
         style={{ display: "none" }}
         onChange={(e) => {
@@ -25,7 +27,6 @@ function LoadButton({ loader }) {
           const reader = new FileReader();
           reader.onload = () => {
             const text = reader.result;
-            console.log(text);
             loader(text);
           };
           reader.readAsText(file);
