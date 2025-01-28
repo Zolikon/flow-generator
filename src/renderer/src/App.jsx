@@ -11,6 +11,7 @@ import UMLHelp from "./UMLHelp";
 import AIHelp from "./AIHelp";
 import SaveButton from "./components/SaveButton";
 import LoadButton from "./components/LoadButton";
+import IconButton from "./components/IconButton";
 
 function App() {
   const [editorMode, setEditorMode] = useState("uml");
@@ -132,9 +133,10 @@ function App() {
                 help={<AIHelp />}
                 executeOnCtrlEnter={generateAiDiagram}
               >
-                <span className="h-[90%] w-10 m-2 flex items-center justify-center hover:bg-slate-400 rounded-md cursor-pointer">
-                  UML
-                </span>
+                <IconButton
+                  iconName="add_to_drive"
+                  onClick={() => setPrompt((p) => p + "${diagram}")}
+                />
               </CollapsibleInput>
               <CollapsibleInput
                 key="uml_with_ai"
@@ -173,7 +175,7 @@ function App() {
                         onClick={() => dialogRef.current.showModal()}
                       >
                         <div
-                          className="h-full p-2 select-none"
+                          className="h-full p-2 select-none flex items-center justify-center"
                           ref={imageRef}
                         ></div>
                       </div>

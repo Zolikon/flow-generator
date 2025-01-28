@@ -5,7 +5,7 @@ import { join } from "path";
 import { execSync } from "child_process";
 
 export function createWindow() {
-  const mainWindow = new Window();
+  const mainWindow = new Window({ icon: resolveResourcePath("icon.png") });
 
   mainWindow.on("ready-to-show", () => {
     mainWindow.show();

@@ -3,8 +3,10 @@ import { useEffect, useRef } from "react";
 import Button from "./Button";
 import IconButton from "./IconButton";
 import { motion } from "motion/react";
+import CopyButton from "./CopyButton";
 
 function CollapsibleInput({
+  children,
   title,
   value,
   setValue,
@@ -72,9 +74,13 @@ function CollapsibleInput({
           animate={{ flexGrow: 1 }}
           exit={{ width: 50, flexGrow: 0 }}
         >
-          <p className="w-full text-center text-4xl font-bold">
+          <motion.p
+            className="w-full text-center text-4xl font-bold"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
             {changedSinceGeneration ? title + "*" : title}
-          </p>
+          </motion.p>
           <div className="flex-grow flex flex-col relative">
             <textarea
               ref={textAreaRef}
@@ -91,12 +97,8 @@ function CollapsibleInput({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <IconButton
-                iconName="content_copy"
-                onClick={() => {
-                  navigator.clipboard.writeText(value);
-                }}
-              />
+              {children}
+              <CopyButton textToCopy={value} />
               <IconButton
                 iconName="question_mark"
                 theme="blue"
@@ -123,6 +125,7 @@ function CollapsibleInput({
 }
 
 CollapsibleInput.propTypes = {
+  children: PropTypes.node,
   title: PropTypes.string.isRequired,
   value: PropTypes.string.isRequired,
   disabled: PropTypes.bool,

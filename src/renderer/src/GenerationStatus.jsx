@@ -1,4 +1,4 @@
-import { CircleLoader, HashLoader } from "react-spinners";
+import { HashLoader } from "react-spinners";
 import { useEditor } from "./EditorContext";
 
 function GenerationStatus() {
