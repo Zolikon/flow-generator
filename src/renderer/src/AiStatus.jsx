@@ -89,6 +89,7 @@ function AiStatus() {
           <p className="font-extrabold text-2xl">
             {initialApiKey ? "Update API Key" : "Configure API Key"}
           </p>
+          <p>Add an OpenAi api key to enable AI features</p>
           <div className="flex flex-col items-center gap-2">
             <PasswordInput
               value={apiKey}
