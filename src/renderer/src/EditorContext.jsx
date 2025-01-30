@@ -8,6 +8,7 @@ const EditorContext = createContext();
 const initialState = {
   diagramSvgString: "",
   isAiEnabled: false,
+  file: null,
   isGenerationTypeAi: false,
   isAiGenerationInProgress: false,
   isDiagramGenerationInProgress: false,
@@ -33,9 +34,12 @@ function reducer(state, { type, payload }) {
         isAiGenerationInProgress: false,
         isDiagramGenerationInProgress: false,
         diagramSvgString: "",
+        file: null,
       };
     case "setJavaAvailability":
       return { ...state, isJavaAvailable: payload };
+    case "setFile":
+      return { ...state, file: payload };
     default:
       throw new Error();
   }
@@ -85,7 +89,15 @@ function EditorProvider({ children }) {
   const generateUsingAi = function (prompt, uml) {
     dispatcher({ type: "updateAiGenerationInProgress", payload: true });
     dispatcher({ type: "updateIsGenerationTypeAi", payload: true });
-    eventBus.send("ai:generate", { prompt, uml });
+    eventBus.send("ai:generate", {
+      prompt,
+      uml,
+      attachment: currentValue.file?.path,
+    });
+  };
+
+  const setFile = function (file) {
+    dispatcher({ type: "setFile", payload: file });
   };
 
   return (
@@ -98,6 +110,7 @@ function EditorProvider({ children }) {
         generateUsingAi,
         generateUsingUml,
         reset,
+        setFile,
       }}
     >
       {children}

@@ -4,6 +4,7 @@ import { createWindow, isJavaInstalled } from "./utils";
 import plantuml from "./platinum_local";
 import Store from "electron-store";
 import { callChatGPT, setupOpenAI, testAiConnection } from "./ai_client";
+import fs from "fs";
 
 let mainWindow;
 const store = new Store();
@@ -52,10 +53,27 @@ app.whenReady().then(() => {
 
   ipcMain.on("ai:generate", (event, message) => {
     mainWindow.send("diagram:generationStarted");
+    const attachmentPath = message.attachment;
+    let fileContent = "";
+    if (attachmentPath) {
+      fileContent = fs.readFileSync(attachmentPath, "utf8");
+    }
+
     message = message.prompt.replaceAll(
       "${diagram}",
       `\n\`\`\`plantml\n${message.uml}\n\`\`\`\n`,
     );
+    if (attachmentPath) {
+      if (message.includes("${file}")) {
+        message = message.replaceAll(
+          "${file}",
+          `\n\`\`\`code\n${fileContent}\n\`\`\`\n`,
+        );
+      } else {
+        message =
+          message + `\n#Attachment\n\`\`\`code\n${fileContent}\n\`\`\`\n`;
+      }
+    }
 
     callChatGPT(message)
       .then((result) => mainWindow.send("ai:generationCompleted", result))

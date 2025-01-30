@@ -11,13 +11,14 @@ import UMLHelp from "./UMLHelp";
 import AIHelp from "./AIHelp";
 import SaveButton from "./components/SaveButton";
 import LoadButton from "./components/LoadButton";
-import IconButton from "./components/IconButton";
+import FileInput from "./components/FileInput";
 
 function App() {
   const [editorMode, setEditorMode] = useState("uml");
   const {
     isAiEnabled,
     reset,
+    file,
     isGenerationInProgress,
     diagramSvgString,
     isJavaAvailable,
@@ -133,10 +134,7 @@ function App() {
                 help={<AIHelp />}
                 executeOnCtrlEnter={generateAiDiagram}
               >
-                <IconButton
-                  iconName="add_to_drive"
-                  onClick={() => setPrompt((p) => p + "${diagram}")}
-                />
+                <FileInput />
               </CollapsibleInput>
               <CollapsibleInput
                 key="uml_with_ai"
@@ -205,7 +203,7 @@ function App() {
                 onClick={resetEditor}
                 disabled={
                   isGenerationInProgress ||
-                  (!currentUmlCode && !prompt && !diagramSvgString)
+                  (!currentUmlCode && !prompt && !diagramSvgString && !file)
                 }
               />
               {diagramSvgString && (

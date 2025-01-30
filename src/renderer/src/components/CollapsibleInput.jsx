@@ -97,7 +97,6 @@ function CollapsibleInput({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              {children}
               <CopyButton textToCopy={value} />
               <IconButton
                 iconName="question_mark"
@@ -106,11 +105,12 @@ function CollapsibleInput({
               />
             </motion.div>
           </div>
+          {children}
         </motion.div>
       )}
       <dialog
         ref={dialogRef}
-        className="w-[50vw] h-[50vh] rounded-md p-4"
+        className="w-[80vw] h-[80vh] rounded-md p-4"
         onClick={handleBackdropClick}
       >
         <div className="flex flex-col h-full w-full gap-4 items-center justify-start">
